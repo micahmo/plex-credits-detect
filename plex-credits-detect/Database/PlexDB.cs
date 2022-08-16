@@ -73,8 +73,7 @@ namespace plexCreditsDetect.Database
             sb.Version = 3;
             sb.FailIfMissing = true;
             sb.CacheSize = 0;
-            Console.WriteLine("Using WAL mode.");
-            sb.JournalMode = SQLiteJournalModeEnum.Wal;
+            //sb.JournalMode = SQLiteJournalModeEnum.Wal;
 
             sqlite_conn = new SQLiteConnection(sb.ToString());
 
@@ -688,6 +687,9 @@ namespace plexCreditsDetect.Database
 
         public Dictionary<string, DateTime> GetRecentlyModifiedDirectories(DateTime since)
         {
+            CloseDatabase();
+            LoadDatabase(databasePath);
+
             Dictionary<string, DateTime> ret = new Dictionary<string, DateTime>();
 
             var result = ExecuteDBQuery("SELECT * FROM directories " +

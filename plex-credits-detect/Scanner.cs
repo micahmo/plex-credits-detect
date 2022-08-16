@@ -1317,7 +1317,7 @@ namespace plexCreditsDetect
             {
                 data = plexDB.GetRecentlyModifiedDirectories(db.lastPlexDirectoryChanged);
 
-                if (data.Count > 0)
+                //if (data.Count > 0)
                 {
                     Console.WriteLine($"Found changed directories: {data.Count} \n");
                 }
