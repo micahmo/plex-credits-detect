@@ -73,6 +73,8 @@ namespace plexCreditsDetect.Database
             sb.Version = 3;
             sb.FailIfMissing = true;
             sb.CacheSize = 0;
+            Console.WriteLine("Using WAL mode.");
+            sb.JournalMode = SQLiteJournalModeEnum.Wal;
 
             sqlite_conn = new SQLiteConnection(sb.ToString());
 
