@@ -3,22 +3,26 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
     
-env:
-    IMAGE_NAME: plex-credits-detect
 jobs:
-    push_to_registries:
-        name: Push Docker image
-        runs-on: ubuntu-latest
-        steps:
-          - name: Check out the repo
-            uses: actions/checkout@v2
-            with:
-                submodules: true
-          - name: Push to Docker Hub
-            uses: docker/build-push-action@v1
-            with:
-                username: ${{ secrets.DOCKERHUB_USERNAME }}
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
-                repository: cjmanca/plex-credits-detect
-                tag_with_ref: true
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    # Build
+    - name: Build image
+      run: |
+        [[ $GITHUB_REF_NAME = "main" ]] && TAG="latest" || TAG=$GITHUB_REF_NAME
+        TAG="${TAG//\//$'-'}"
+        docker build . --file Dockerfile --tag ghcr.io/"${GITHUB_REPOSITORY,,}":$TAG
+    
+    # Push
+    - name: Push image
+      if: github.event_name != 'pull_request'
+      run: |
+        [[ $GITHUB_REF_NAME = "main" ]] && TAG="latest" || TAG=$GITHUB_REF_NAME
+        TAG="${TAG//\//$'-'}"
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_REPOSITORY_OWNER --password-stdin
+        docker push ghcr.io/"${GITHUB_REPOSITORY,,}":$TAG
